@@ -4,3 +4,4 @@ test*.py
 *.xmind
 *.sublime*
 
+*.csv#

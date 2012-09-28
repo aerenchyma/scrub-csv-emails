@@ -1,6 +1,4 @@
 import csv
-import sys
-import pprint
 
 # This script will expext three arguments:
 # 1. File with data to be scrubbed
@@ -11,9 +9,7 @@ import pprint
 # opened_file = open(argv[1], 'rt)'
 # opened_file
 
-pp = pprint.PrettyPrinter(depth=4)
 manual_repair = []
-
 
 def strip_blank_fields(file):
     try:
@@ -71,7 +67,7 @@ def split_on_blanks(rows):
     return rows
 
 
-def find_duplicate_names(rows):
+def remove_duplicate_names(rows):
     # grab a row
     # grab the first item in the row, and then check all the other items against it
     # if any of them match, figure out which position they are matching, and determine through that if it
@@ -84,35 +80,53 @@ def find_duplicate_names(rows):
     return rows
 
 
-# If there is a title, use that instead of adding a blank
-def remove_titles(rows):
-    """If a row has Mr. or Mrs. in it,
-    remove that title."""
-    titles = ['Mr', 'Mrs', 'Mr.', 'Mrs.', 'mr', 'mrs', 'mr.', 'mrs.', 'Miss', 'miss']
+# # If there is a title, use that instead of adding a blank
+# def remove_titles(rows):
+#     """If a row has Mr. or Mrs. in it,
+#     remove that title."""
+#     titles = [
+#         'Mr', 'Mrs', 'Mr.', 'Mrs.', 'mr',
+#         'mrs', 'mr.', 'mrs.', 'Miss', 'miss'
+#     ]
 
-    for row in rows:
-        for num, field in enumerate(row):
-            if field in titles:
-                row[num].remove()
-    return rows
+#     for row in rows:
+#         for num, field in enumerate(row):
+#             if field in titles:
+#                 row[num].remove()
+#     return rows
 
 
 def test_for_email(rows):
     """Test if there is an email address
-    present in the row(list).  Takes a list
+    present in the row.  Takes a list
     and returns a tuple: 0) len(manual_repair)
     1) manual_repair 2) rows.  Does not remove bad data."""
     global manual_repair
 
-    for row in rows:
+    for num, row in enumerate(rows):
         bad = True
         for field in row:
             if '@' in field:
                 bad = False
+                break
         if bad == True:
-            manual_repair.append(row)
-    len_bad_list = len(manual_repair)
-    return len_bad_list, manual_repair, rows
+            x = rows.pop(num)
+            manual_repair.append(x)
+    return manual_repair, rows
+
+
+def columnize(rows):
+    titles = [
+    'Mr', 'Mrs', 'Mr.', 'Mrs.', 'mr',
+    'mrs', 'mr.', 'mrs.', 'Miss', 'miss'
+    ]
+
+    for row in rows:
+        # if there is a mr, mrs, etc, then don't prepend,
+        # if there is no mr, mrs, etc, then prepend with ''
+        if set(row).isdisjoint(set(titles)):
+            row.insert(0, '')
+    return rows
 
 
 def remove_bad_lists(manual_repair):  # Interactively later
