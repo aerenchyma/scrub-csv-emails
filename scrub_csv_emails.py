@@ -1,4 +1,6 @@
+# TODO: Change the strip_blank_fields function to use a with statement
 import csv
+import sys
 
 # This script will expext three arguments:
 # 1. File with data to be scrubbed
@@ -10,6 +12,7 @@ import csv
 # opened_file
 
 manual_repair = []
+
 
 def strip_blank_fields(file):
     try:
@@ -46,9 +49,11 @@ def strip_blank_lists(rows):
         if row == []:
             rows.remove(row)
     return rows
+    # why not this:
+    # while [] in rows:
+    #    rows.remove([])
 
 
-# Option1: Remove original, then extend, and later move email to last
 def split_on_blanks(rows):
     for row in rows:
         for num, field in enumerate(row):
@@ -68,10 +73,6 @@ def split_on_blanks(rows):
 
 
 def remove_duplicate_names(rows):
-    # grab a row
-    # grab the first item in the row, and then check all the other items against it
-    # if any of them match, figure out which position they are matching, and determine through that if it
-    # is the first name or last name to delete
     for num, row in (enumerate(rows)):
         for x in xrange(len(row)):
             if row.count(row[x]) > 1:
@@ -80,29 +81,16 @@ def remove_duplicate_names(rows):
     return rows
 
 
-# # If there is a title, use that instead of adding a blank
-# def remove_titles(rows):
-#     """If a row has Mr. or Mrs. in it,
-#     remove that title."""
-#     titles = [
-#         'Mr', 'Mrs', 'Mr.', 'Mrs.', 'mr',
-#         'mrs', 'mr.', 'mrs.', 'Miss', 'miss'
-#     ]
-
-#     for row in rows:
-#         for num, field in enumerate(row):
-#             if field in titles:
-#                 row[num].remove()
-#     return rows
-
-
-def test_for_email(rows):
-    """Test if there is an email address
-    present in the row.  Takes a list
-    and returns a tuple: 0) len(manual_repair)
-    1) manual_repair 2) rows.  Does not remove bad data."""
+def remove_bad_rows(rows):
     global manual_repair
 
+  # Remove all rows that don't have at least three slots filled
+    for num, row in enumerate(rows):
+        if len(row) < 3:
+            x = rows.pop(num)
+            manual_repair.append(x)
+
+    # Remove all rows that don't have an email address.
     for num, row in enumerate(rows):
         bad = True
         for field in row:
@@ -112,7 +100,8 @@ def test_for_email(rows):
         if bad == True:
             x = rows.pop(num)
             manual_repair.append(x)
-    return manual_repair, rows
+
+    return manual_repair
 
 
 def columnize(rows):
@@ -122,12 +111,22 @@ def columnize(rows):
     ]
 
     for row in rows:
-        # if there is a mr, mrs, etc, then don't prepend,
-        # if there is no mr, mrs, etc, then prepend with ''
         if set(row).isdisjoint(set(titles)):
             row.insert(0, '')
+
     return rows
 
 
-def remove_bad_lists(manual_repair):  # Interactively later
-    pass
+def write_csv(rows, filename):
+    f = open(filename, 'wt')
+    try:
+        writer = csv.writer(f)
+        writer.writerow(('Title', 'First', 'Middle', 'Last', 'Email'))
+        for row in rows:
+            writer.writerow(row)
+    finally:
+        f.close()
+
+    print open(filename, 'rt').read()
+
+
