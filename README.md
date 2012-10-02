@@ -1,4 +1,4 @@
-Scrub CSV Emails
-==============
+skeleton
+========
 
-A script to scrub a csv full of names and email addresses.
+A project skeleton to start my Python projects
