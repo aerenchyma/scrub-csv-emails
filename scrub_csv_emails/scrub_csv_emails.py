@@ -11,21 +11,38 @@ import sys
 # opened_file = open(argv[1], 'rt)'
 # opened_file
 
+# A list of the names of functions to call.
+# This will also determine the order of function calls.
+functions = [
+    'strip_blank_fields',
+    'strip_whitespace',
+    'capitalize',
+    'strip_blank',
+    'split_on_blanks',
+    'remove_duplicate_names',
+    'remove_bad_rows',
+    'columnize',
+    'write_csv'
+    ]
+
+# Strip out all functions that were passed in as argunments (from command line)
+# as false.
+
 manual_repair = []
 
 
-def strip_blank_fields(file):
-    try:
-        opened_file = open(file, 'rt')
-        read_file = csv.reader(opened_file)
-        blankless = []
-        for row in read_file:
-            while "" in row:
-                row.remove("")
-            blankless.append(row)
-    finally:
-        opened_file.close()
-    return blankless
+def grab_file_data(in_file):
+    with open(in_file, 'rt') as opened_file:
+        rows = csv.reader(opened_file)
+        return rows
+        opened_file.close
+
+
+def strip_blank_fields(rows):
+    for row in rows:
+        while "" in row:
+            row.remove("")
+    return rows
 
 
 def strip_whitespace(rows):
@@ -130,3 +147,9 @@ def write_csv(rows, filename):
     print open(filename, 'rt').read()
 
 
+# Iterate through the list of functions and execute them in order of the list.
+# if __name__ == __main__:
+    # rows = grab_file_data(sys.argv[1])
+    # for function in functions:
+        # next_operation = globals()[function]
+        # rows = next_operation(rows)
