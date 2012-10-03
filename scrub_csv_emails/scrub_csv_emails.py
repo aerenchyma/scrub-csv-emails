@@ -33,7 +33,10 @@ manual_repair = []
 
 def grab_file_data(in_file):
     with open(in_file, 'rt') as opened_file:
-        rows = csv.reader(opened_file)
+        read_file = csv.reader(opened_file)
+        rows = []
+        for row in read_file:
+            rows.append(row)
         return rows
         opened_file.close
 
