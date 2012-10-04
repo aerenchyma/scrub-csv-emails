@@ -13,35 +13,28 @@ import sys
 
 # A list of the names of functions to call.
 # This will also determine the order of function calls.
-functions = [
-    'strip_blank_fields',
-    'strip_whitespace',
-    'capitalize',
-    'strip_blank',
-    'split_on_blanks',
-    'remove_duplicate_names',
-    'remove_bad_rows',
-    'columnize',
-    'write_csv'
-    ]
-
-# Strip out all functions that were passed in as argunments (from command line)
-# as false.
-
-manual_repair = []
 
 
-def grab_file_data(in_file):
+
+def grab_file_data(in_file, out_good_file, out_bad_file):
+    print "---------"
+    print "running grab_file_data()"
+    raw_input()
     with open(in_file, 'rt') as opened_file:
         read_file = csv.reader(opened_file)
         rows = []
         for row in read_file:
             rows.append(row)
-        return rows
+        return rows, out_good_file, out_bad_file
         opened_file.close
 
 
 def strip_blank_fields(rows):
+    print "---------"
+    print "running strip_blank_fields()"
+    print "rows? %r" % bool(rows)
+    raw_input()
+
     for row in rows:
         while "" in row:
             row.remove("")
@@ -49,6 +42,10 @@ def strip_blank_fields(rows):
 
 
 def strip_whitespace(rows):
+    print "---------"
+    print "running strip_whitespace()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     for row in rows:
         for num, field in enumerate(row):
             row[num] = field.strip()
@@ -56,6 +53,10 @@ def strip_whitespace(rows):
 
 
 def capitalize(rows):
+    print "---------"
+    print "running capitalize()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     for row in rows:
         for num, field in enumerate(row):
             if "@" not in field and not field.istitle():
@@ -65,6 +66,10 @@ def capitalize(rows):
 
 
 def strip_blank_lists(rows):
+    print "---------"
+    print "running strip_blank_lists()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     for row in rows:
         if row == []:
             rows.remove(row)
@@ -75,6 +80,10 @@ def strip_blank_lists(rows):
 
 
 def split_on_blanks(rows):
+    print "---------"
+    print "running split_on_blanks()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     for row in rows:
         for num, field in enumerate(row):
             if ' ' in field:
@@ -93,6 +102,10 @@ def split_on_blanks(rows):
 
 
 def remove_duplicate_names(rows):
+    print "---------"
+    print "running remove_duplicate_names()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     for num, row in (enumerate(rows)):
         for x in xrange(len(row)):
             if row.count(row[x]) > 1:
@@ -102,6 +115,10 @@ def remove_duplicate_names(rows):
 
 
 def remove_bad_rows(rows):
+    print "---------"
+    print "running remove_bad_rows()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     global manual_repair
 
   # Remove all rows that don't have at least three slots filled
@@ -121,16 +138,23 @@ def remove_bad_rows(rows):
             x = rows.pop(num)
             manual_repair.append(x)
 
-    return manual_repair
-
+    return rows
 
 def columnize(rows):
+    print "---------"
+    print "running columize()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     titles = [
     'Mr', 'Mrs', 'Mr.', 'Mrs.', 'mr',
     'mrs', 'mr.', 'mrs.', 'Miss', 'miss'
     ]
 
     for row in rows:
+        print "-----------"
+        print "top of for loop"
+        print "row = %r " % row
+        raw_input()
         if set(row).isdisjoint(set(titles)):
             row.insert(0, '')
 
@@ -138,6 +162,10 @@ def columnize(rows):
 
 
 def write_csv(rows, filename):
+    print "---------"
+    print "running write_csv()"
+    print "rows? %r" % bool(rows)
+    raw_input()
     f = open(filename, 'wt')
     try:
         writer = csv.writer(f)
@@ -147,15 +175,31 @@ def write_csv(rows, filename):
     finally:
         f.close()
 
-    print open(filename, 'rt').read()
-
 
 # Iterate through the list of functions and execute them in order of the list.
-# if __name__ == __main__:
-    # rows = grab_file_data(sys.argv[1])
-    # for function in functions:
-        # next_operation = globals()[function]
-        # rows = next_operation(rows)
-        # hard code the function to write the files
-        # should I have it output a manual_repair list no matter what?
+if __name__ == "__main__":
+    global functions
+    global manual_repair
+    functions = [
+        'strip_blank_fields',
+        'strip_whitespace',
+        'capitalize',
+        'strip_blank_lists',
+        'split_on_blanks',
+        'remove_duplicate_names',
+        'remove_bad_rows',
+        'columnize',
+        ]
+
+# Strip out all functions that were passed in as argunments (from command line)
+# as false.
+
+    manual_repair = []
+    rows, good_file, file_to_repair = grab_file_data(sys.argv[1], sys.argv[2], sys.argv[3])
+    for function in functions:
+        next_operation = globals()[function]
+        rows = next_operation(rows)
+    write_csv(rows, good_file)
+    if manual_repair:
+        write_csv(manual_repair, file_to_repair)
 
