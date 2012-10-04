@@ -156,3 +156,6 @@ def write_csv(rows, filename):
     # for function in functions:
         # next_operation = globals()[function]
         # rows = next_operation(rows)
+        # hard code the function to write the files
+        # should I have it output a manual_repair list no matter what?
+
