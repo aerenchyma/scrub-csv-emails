@@ -1,4 +1,3 @@
-# TODO: Change the strip_blank_fields function to use a with statement
 import csv
 import sys
 
@@ -7,27 +6,15 @@ import sys
 # 2. File name to output clean data
 # 3. File name to output data that's needs manual review
 
-# argv style:
-# opened_file = open(argv[1], 'rt)'
-# opened_file
-
-# A list of the names of functions to call.
-# This will also determine the order of function calls.
-
-
 class CleanCsv(object):
-    # change this to just take and unpack args
     def __init__(self, args):
         self.in_file = args[1]  # Storing original (necc?)
         self.clean_out_file = args[2]
         self.dirty_out_file = args[3]
         self.flags = [x for x in args[4:] if sys.argv != ""]
-        # Bug?  sys.argv will never be blank         ^^^
+        # Bug?  sys.argv will never be blank----------> ^^^
         self.manual_repair = []
         self.rows = []
-        print "-------"
-        print "instantiated self.rows: %r" % self.rows
-        raw_input()
         self.functions = [
             'strip_blank_fields',
             'strip_whitespace',
@@ -42,24 +29,12 @@ class CleanCsv(object):
     def do_scrub(self):
             self.fxns = [x for x in self.functions if x not in self.flags]
             self.grab_file_data(self.in_file)
-            print "--------"
-            print "wrote the file data to self.rows: %r" % bool(self.rows)
-            raw_input()
             for fx in self.fxns:
-                print "------"
-                print "in the for fx in self.fxns"
-                print "self.fxns == %r" % self.fxns
-                print "fx == %r" % fx
-                raw_input()
                 next_operation = getattr(self, fx)
-                print "--------"
-                print "got the attr: next_operation == %r" % next_operation
-                print "self.rows? %r" % self.rows
-                raw_input()
                 next_operation()
             if self.manual_repair:
-                self.dirty_out_file_complete = self.write_csv(self.manual_repair, self.dirty_out_file)
-            self.clean_out_file_complete = self.write_csv(self.rows, self.in_file)
+                self.write_csv(self.manual_repair, self.dirty_out_file)
+            self.write_csv(self.rows, self.clean_out_file)
 
     def grab_file_data(self, filename):
         with open(filename, 'rt') as opened_file:
@@ -67,17 +42,8 @@ class CleanCsv(object):
             for row in read_file:
                 self.rows.append(row)
             opened_file.close
-            print "----------"
-            print "closed the file"
-            print "self.rows? %r" % bool(self.rows)
-            print "self.rows[0]: %r" % self.rows[0]
-            raw_input()
 
     def strip_blank_fields(self):
-        print "--------"
-        print "in the top of the strip_blank_fields()"
-        print "self.rows? %r" % bool(self.rows)
-        raw_input()
         for row in self.rows:
             while "" in row:
                 row.remove("")
@@ -152,7 +118,7 @@ class CleanCsv(object):
         try:
             writer = csv.writer(f)
             writer.writerow(('Title', 'First', 'Middle', 'Last', 'Email'))
-            for row in self.rows:
+            for row in rows:
                 writer.writerow(row)
         finally:
             f.close()
