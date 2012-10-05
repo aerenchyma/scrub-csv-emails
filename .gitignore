@@ -32,6 +32,8 @@ nosetests.xml
 .pydevproject
 
 # Project specific
-*.xmind
+*.xmind*
 *.csv#
 *.csv
+
+jackies*
