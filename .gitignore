@@ -31,9 +31,11 @@ nosetests.xml
 .project
 .pydevproject
 
+# My .gitignore
+*sublime*
+
 # Project specific
 *.xmind*
 *.csv#
 *.csv
-
 jackies*
