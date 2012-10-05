@@ -25,6 +25,9 @@ class CleanCsv(object):
         # Bug?  sys.argv will never be blank         ^^^
         self.manual_repair = []
         self.rows = []
+        print "-------"
+        print "instantiated self.rows: %r" % self.rows
+        raw_input()
         self.functions = [
             'strip_blank_fields',
             'strip_whitespace',
@@ -38,7 +41,10 @@ class CleanCsv(object):
 
     def do_scrub(self):
             self.fxns = [x for x in self.functions if x not in self.flags]
-            self.rows = self.grab_file_data(self.in_file)
+            self.grab_file_data(self.in_file)
+            print "--------"
+            print "wrote the file data to self.rows: %r" % bool(self.rows)
+            raw_input()
             for fx in self.fxns:
                 print "------"
                 print "in the for fx in self.fxns"
